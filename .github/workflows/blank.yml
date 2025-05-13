@@ -1,0 +1,28 @@
+name: Proteger rama al crearla
+
+on:
+  create:
+    branches:
+      - '*'  # Aplica a cualquier nueva rama
+
+jobs:
+  proteger:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configurar protección de rama
+      run: |
+        curl -X PUT \
+          -H "Authorization: token ${{ secrets.GH_PAT }}" \
+          -H "Accept: application/vnd.github.luke-cage-preview+json" \
+          -H "Content-Type: application/json" \
+          https://api.github.com/repos/${{ github.repository }}/branches/${{ github.ref_name }}/protection \
+          -d '{
+            "required_status_checks": null,
+            "enforce_admins": true,
+            "required_pull_request_reviews": null
+            "restrictions": {
+              "users": [],
+              "teams": ["devops"]
+            }
+          }'
